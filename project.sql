@@ -6,7 +6,7 @@
 -- Apply SQL querying skills for real-world data analysis
 -- Extract, join, group, and aggregate data to generate insights
 -- Make data-driven decisions based on sales data
-
+-- 23456
 
 
 
