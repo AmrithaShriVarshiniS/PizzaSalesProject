@@ -272,6 +272,8 @@ order by Avg_selling_price desc;
 -- Chicken has highest ASP (17.73) followed by Supreme (17.37), Veggie(16.63) and 
 -- Classic has the least ASP(14.78)
 
+-- ---------------------------------------------------------------------------------------------------------------------------
+
 -- Chapter 2: Data Exploration
 -- Task 1: Retrieve the total number of orders placed.
 -- Task 2: Calculate the total revenue generated from pizza sales.
@@ -304,6 +306,7 @@ from size_orderDetails
 group by size
 order by size;
 
+-- -----------------------------------------------------------------------------------------------------------------------------
 
 -- Chapter 3: Sales Analysis - Crunching the Numbers
 -- Task 1: List the top 5 most ordered pizza types along with their quantities.
@@ -351,6 +354,7 @@ from od_pt_p
 group by pizza_type_id, name
 order by total_revenue desc;
 
+-- -----------------------------------------------------------------------------------------------------------------------------
 
 -- Chapter 4: Operational Insights
 -- Task 1: Calculate the percentage contribution of each pizza type to total revenue.
@@ -417,7 +421,24 @@ from running_revenue;
 
 
 -- Task 3: Determine the top 3 most ordered pizza types based on revenue for each pizza category.
--- Result: U
+-- Result:
+-- Chicken Category:
+-- The Thai Chicken Pizza generates the highest revenue (₹43,434), followed by
+-- Barbecue Chicken Pizza (₹42,768) and
+-- California Chicken Pizza (₹41,409).
+-- Classic Category:
+-- The Classic Deluxe Pizza leads with ₹38,180,
+-- followed by Hawaiian Pizza (₹32,273) and
+-- Pepperoni Pizza (₹30,161).
+-- Supreme Category:
+-- Spicy Italian Pizza ranks first (₹34,831),
+-- followed by Italian Supreme Pizza (₹33,476) and
+-- Sicilian Pizza (₹30,940).
+-- Veggie Category:
+-- Four Cheese Pizza leads (₹32,265),
+-- followed by Mexicana Pizza (₹26,780) and
+-- Five Cheese Pizza (₹26,066).
+
 with pt_p_od as (
 select pt.category, pt.name, p.pizza_type_id, price * quantity as revenue
 from pizza_types as pt
@@ -437,6 +458,7 @@ from category_pt)
 select * from ranked
 where rn <= 3;
 
+-- ------------------------------------------------------------------------------------------------------------------------ 
 
 -- Chapter 5: Category-Wise Analysis
 -- Task 1: Join the necessary tables to find the total quantity of each pizza category ordered.
@@ -494,20 +516,22 @@ group by date)
 select avg(quan_per_day) as avg_qnty_per_day
 from od_o;
 
+-- --------------------------------------------------------------------------------------------------------------------
 
+-- Quantity based Pareto Analysis: Identify high-performing pizza IDs contributing significantly to total sales volume
+-- result
+--  out of 91 pizza_types(pizza_id), 19 is contributing to 40% of sales & they are as follows
+-- 'bbq_ckn_l', 'bbq_ckn_m', 'big_meat_s', 'cali_ckn_l','cali_ckn_m','classic_dlx_m','classic_dlx_s',
+-- 'five_cheese_l','four_cheese_l','hawaiian_l','hawaiian_s','ital_supr_m','mexicana_l','pepperoni_m',
+-- 'pepperoni_s', 'sicilian_s', 'southw_ckn_l', 'spicy_ital_l', 'thai_ckn_l'
 
--- End of Project Deliverables:
--- Create the summary of insights and recommendations for store management 
+-- Sales are somewhat concentrated but not extreme (not 80/20).
+-- Store is moderately dependent on a small set of SKUs (Stock Keeping Units).
+-- These 19 items should be:
+-- Always in stock
+-- Promoted strategically
+-- Protected from stock-outs
 
--- 
-
-
-
-
-
-
-
--- 1. Quantity
 with quan_temp as(
 select pizza_id, sum(quantity) as quantityPerPizzaID,
 ntile(5) over(order by sum(quantity) desc) as percentile
@@ -526,9 +550,45 @@ from quantPerPercentile;
 -- 'five_cheese_l','four_cheese_l','hawaiian_l','hawaiian_s','ital_supr_m','mexicana_l','pepperoni_m',
 -- 'pepperoni_s', 'sicilian_s', 'southw_ckn_l', 'spicy_ital_l', 'thai_ckn_l'
 
-select p.pizza_id, sum(od.quantity) as total_quantity
-from pizzas as p
-inner join order_details as od
-on p.pizza_id = od.pizza_id
-group by p.pizza_id
-order by total_quantity desc;
+-- ----------------------------------------------------------------------------------------------------------------------
+
+-- End of Project Deliverables:
+-- Create the summary of insights and recommendations for store management 
+
+-- SUMMARY OF INSIGHTS
+-- Business demand is stable throughout the year.
+-- Revenue is concentrated around lunch and early dinner windows.
+-- Demand builds toward end-of-week, but Sunday underperforms.
+-- Revenue differences largely driven by pricing strategy (ASP effect) i.e. Volume-driven Classic category & Margin-driven Chicken & Supreme categories.
+-- Large-sized pizzas dominate customer preference.
+
+
+-- Recommendations for Store Management
+-- 1 . Staffing Optimization
+-- Increase staffing during 12–2 PM and 5–8 PM
+-- Reduce staffing during late-night hours to optimize labor costs
+
+-- 2. Menu & Pricing Strategy
+-- Promote Chicken & Supreme categories more (higher ASP → better margins)
+-- Use Classic pizzas as traffic drivers
+-- Consider combo offers upgrading customers from M → L size (since L is popular)
+
+-- 3. Friday & Weekend Strategy
+-- Introduce Friday premium bundles
+-- Create Sunday-specific promotions to lift low-performing day
+-- Push family/combo deals on Sundays
+
+-- 4. Inventory Planning
+-- Maintain higher inventory for:
+-- Large size bases
+-- Chicken & Supreme ingredients
+-- Reduce excess stock for XXL (very low demand)
+
+-- 5. Revenue Growth Opportunities
+-- Since monthly revenue is stable (no seasonality) Growth must come from:
+-- Increasing Average Order Value (AOV)
+-- Cross-selling beverages/sides
+-- Strategic promotions on low-performing hours/days
+
+
+
